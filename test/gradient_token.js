@@ -19,14 +19,7 @@ contract("GradientToken", function(accounts) {
       await contract.mint("#A8E99A", "#8A3C99", { from: accounts[0] });
       const balanceOf = await contract.balanceOf(accounts[0]);
       assert.equal(balanceOf, 1, "Balance of account should be correct");
-      const error = assert.throws(
-        async () =>
-          await contract.mint("#A8E99A", "#8A3C99", { from: accounts[0] })
-      );
-      assert.equal(
-        error,
-        "Error: Returned error: VM Exception while processing transaction: revert ERC721: token already minted -- Reason given: ERC721: token already minted."
-      );
+
     });
   });
 });
