@@ -2,9 +2,10 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GradientToken is ERC721, Ownable {
+contract GradientToken is IERC721, ERC721, Ownable {
     struct Gradient {
         string innerColor;
         string outerColor;
@@ -13,6 +14,8 @@ contract GradientToken is ERC721, Ownable {
     Gradient[] public gradients;
 
     constructor() ERC721("GradientToken", "GRT") {}
+
+    mapping(uint256 => Gradient) public tokenIdToGradient;
 
     function getGradient(uint256 _gradientId)
         public
@@ -30,10 +33,12 @@ contract GradientToken is ERC721, Ownable {
         onlyOwner
     {
         uint256 id =
-            uint256(keccak256(abi.encodePacked(_innerColor, _outerColor)));
-        gradients.push(
-            Gradient({innerColor: _innerColor, outerColor: _outerColor})
-        );
+            uint256(keccak256(abi.encodePacked(_innerColor, _outerColor))) %
+                10000000000;
+        Gradient memory gradient =
+            Gradient({innerColor: _innerColor, outerColor: _outerColor});
+        gradients.push(gradient);
+        tokenIdToGradient[id] = gradient;
         _safeMint(msg.sender, id);
     }
 }
