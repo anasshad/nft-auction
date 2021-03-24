@@ -12,13 +12,19 @@ contract AuctionToken is ERC721Holder {
     struct Auction {
         address seller;
         uint128 price;
+        uint256 tokenId;
         uint256 startTime;
         uint256 endTime;
         uint256 highestBid;
         address highestBidder;
     }
 
+    uint256 public totalHoldings = 0;
+
+    Auction[] public auctions;
+
     mapping(uint256 => Auction) public tokenIdToAuction;
+    mapping(uint256 => uint256) public tokenIdToIndex;
 
     constructor(address _nftAddress) {
         nft = ERC721(_nftAddress);
@@ -47,12 +53,17 @@ contract AuctionToken is ERC721Holder {
             Auction({
                 seller: msg.sender,
                 price: _price,
+                tokenId: _tokenId,
                 startTime: _startTime,
                 endTime: _endTime,
                 highestBid: 0,
                 highestBidder: address(0x0)
             });
         tokenIdToAuction[_tokenId] = auction;
+        auctions.push(auction);
+        tokenIdToIndex[_tokenId] = totalHoldings;
+        totalHoldings++;
+
         emit AuctionCreated(_tokenId);
     }
 
@@ -76,6 +87,10 @@ contract AuctionToken is ERC721Holder {
         require(block.timestamp >= auction.endTime);
         nft.safeTransferFrom(address(this), _to, _tokenId);
         delete tokenIdToAuction[_tokenId];
+        uint256 index = tokenIdToIndex[_tokenId];
+        delete auctions[index];
+        totalHoldings--;
+        delete tokenIdToIndex[_tokenId];
     }
 
     function isBidValid(uint256 _tokenId, uint256 _bidAmount)

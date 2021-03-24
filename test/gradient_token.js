@@ -27,12 +27,21 @@ contract("GradientToken", function(accounts) {
       const symbol = await contract.symbol();
       assert.equal(symbol, "GRT");
     });
+
+    it("has an owner", async () => {
+      const owner = await contract.ownerAddress();
+      assert.notEqual(owner, null);
+      assert.notEqual(owner, "");
+      assert.notEqual(owner, "0x0");
+      assert.notEqual(owner, undefined);
+    });
   });
 
   describe("Minting", async () => {
     let tokenId;
     it("should mint token", async () => {
       const result = await contract.mint("#A8E99A", "#8A3C99", {
+        value: web3.utils.toWei("1.2", "ether"),
         from: accounts[0],
       });
       tokenId = result.logs[0].args.tokenId;

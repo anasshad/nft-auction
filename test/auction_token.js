@@ -26,10 +26,11 @@ contract("AuctionToken", function(accounts) {
   describe("Auction creation", async () => {
     it("creates an auction", async () => {
       const tokenMinted = await gradientToken.mint("#A8E99A", "#8A3C99", {
+        value: web3.utils.toWei("1", "ether"),
         from: accounts[0],
       });
       tokenId = tokenMinted.logs[0].args.tokenId;
-
+      console.log(tokenMinted);
       gradientToken.approve(auctionToken.address, tokenId, {
         from: accounts[0],
       });

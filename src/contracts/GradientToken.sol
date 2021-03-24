@@ -13,7 +13,11 @@ contract GradientToken is IERC721, ERC721, Ownable {
 
     Gradient[] public gradients;
 
-    constructor() ERC721("GradientToken", "GRT") {}
+    address payable public ownerAddress;
+
+    constructor() ERC721("GradientToken", "GRT") {
+        ownerAddress = payable(msg.sender);
+    }
 
     mapping(uint256 => Gradient) public tokenIdToGradient;
 
@@ -30,8 +34,9 @@ contract GradientToken is IERC721, ERC721, Ownable {
     function mint(string memory _innerColor, string memory _outerColor)
         public
         payable
-        onlyOwner
     {
+        require(msg.value >= 1 ether);
+        ownerAddress.transfer(msg.value);
         uint256 id =
             uint256(keccak256(abi.encodePacked(_innerColor, _outerColor))) %
                 10000000000;
@@ -41,4 +46,6 @@ contract GradientToken is IERC721, ERC721, Ownable {
         tokenIdToGradient[id] = gradient;
         _safeMint(msg.sender, id);
     }
+
+    receive() external payable {}
 }
